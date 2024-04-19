@@ -1,8 +1,12 @@
 const express = require('express')
 const morgan = require("morgan")
 const app = express()
+const cors = require('cors')
+
 
 app.use(express.json())
+app.use(express.static('dist'))
+app.use(cors())
 
     let persons = [
         {   
@@ -45,12 +49,9 @@ app.use(express.json())
 
   
 
-    const unknownEndpoint = (request, response) => {
+    const unknownEndpoint = (request, response, next) => {
       response.status(404).send({ error: 'unknown endpoint' })
     }
-    app.get('/', (request, response) => {
-        response.send('<h1>Hello World!</h1>')
-      })
       
       app.get('/api/persons', (request, response) => {
         response.json(persons)
@@ -58,14 +59,14 @@ app.use(express.json())
 
 
       
-      app.get('/info', (request, response) => {
+      app.get('/info', (request, response, next) => {
         const currentTime = new Date();
         const numberOfPersons = persons.length;
         response.send(`<p>Phonebook has info for ${numberOfPersons} people</p><p>${currentTime}</p>`);
       });
       
       
-      app.get('/api/persons/:id', (request, response) => {
+      app.get('/api/persons/:id', (request, response, next) => {
         const id = Number(request.params.id)
         const person = persons.find(person =>  person.id === id)
           if (person) {
@@ -80,7 +81,7 @@ app.use(express.json())
         response.status(204).end()
       })
 
-      app.post('/api/persons', (request, response) => { 
+      app.post('/api/persons', (request, response, next) => { 
         const body = request.body
   
 
@@ -108,7 +109,7 @@ app.use(express.json())
 
       app.use(unknownEndpoint)
       
-      const PORT = 3001
-      app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`)
-      })
+    const PORT = process.env.PORT || 3001
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+    })
