@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require("morgan")
 const app = express()
 
 app.use(express.json())
@@ -24,8 +25,29 @@ app.use(express.json())
           name: "Mary Poppendick", 
           number: '39-23-6423122'
       }
-    ]
+    ]  
 
+      morgan.token('post-data', (request, response) => {
+        return request.method === 'POST' ? JSON.stringify(request.body) : ''
+    })
+    app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'))
+    
+    const requestLogger = (request, response, next) => {
+      console.log("Method:", request.method)
+      console.log("Path:", request.path)
+      console.log("Body:", request.body)
+      console.log("---")
+      next()
+    }
+    
+    app.use(requestLogger)
+
+
+  
+
+    const unknownEndpoint = (request, response) => {
+      response.status(404).send({ error: 'unknown endpoint' })
+    }
     app.get('/', (request, response) => {
         response.send('<h1>Hello World!</h1>')
       })
@@ -67,7 +89,7 @@ app.use(express.json())
             error: 'Name or number missing' 
           })
         }
-        
+
         const existingPerson = persons.find(person => person.name === body.name);
 
         if (existingPerson) {
@@ -79,11 +101,13 @@ app.use(express.json())
           number: body.number,
           id: Math.floor(Math.random() * 10000),
         }
-      
+
         response.json(person)
         console.log("uudelleen käynnistys")
       })
 
+      app.use(unknownEndpoint)
+      
       const PORT = 3001
       app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`)
