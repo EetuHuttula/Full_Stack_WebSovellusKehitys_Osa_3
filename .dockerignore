@@ -1,1 +1,1 @@
-fly secrets set MONGODB_URI='mongodb+srv://eetuH:ninja9@cluster0.1iuqoqj.mongodb.net/backend?retryWrites=true&w=majority&appName=Cluster0'
+fly secrets set MONGODB_URI='mongodb+srv://eetuH:pw@cluster0.1iuqoqj.mongodb.net/backend?retryWrites=true&w=majority&appName=Cluster0'
